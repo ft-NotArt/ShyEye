@@ -1,6 +1,7 @@
 import cv2
 import serial
 import time
+import random
 
 # Used for debug mainly, set to True to see what the camera is recording
 DRAW_CAMERA = True
@@ -28,13 +29,28 @@ SERVO_UMOV = 7
 SERVO_DMOV = 8
 
 
-SERVO_SPD = 2
+SERVO_SPD = 10
 
 def draw_square(frame, faces, color):
 	for (x, y, w, h) in faces:
 		face_region = frame[y:y+h, x:x+w]
 		cv2.rectangle(frame, (x, y), (x + w, y + h), color, 1)
 	return frame
+
+# Returns the opposite of a given move
+# for example, the opposite of left move would be right move
+def reverse_move(move) :
+	switch = {
+		SERVO_LMOV : SERVO_RMOV,
+		SERVO_LUMOV : SERVO_RDMOV,
+		SERVO_LDMOV : SERVO_RUMOV,
+		SERVO_RMOV : SERVO_LMOV,
+		SERVO_RDMOV : SERVO_LUMOV,
+		SERVO_RUMOV : SERVO_LDMOV,
+		SERVO_UMOV : SERVO_DMOV,
+		SERVO_DMOV : SERVO_UMOV,
+	}
+	return switch.get(move, SERVO_NOMOV)
 
 
 arduino = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=.1)
@@ -52,6 +68,7 @@ if ret:
 	eyeX = int (frameW / 2)
 	eyeY = int (frameH / 2)
 
+
 while True:
 	ret, frame = video_capture.read()
 	if not ret:
@@ -66,8 +83,13 @@ while True:
 	target = [int ((frameW / 2) - 10), int ((frameH / 2) - 10), 20, 20]
 	eyeDir = SERVO_NOMOV
 	if len(detected_faces) >= 3 :
-		# anxiety code
-		feur = 3
+		print("anxieux")
+		anxiety_queue = []
+		for i in range(3) :
+			anxiety_queue.append(random.choice([SERVO_LMOV, SERVO_LUMOV, SERVO_LDMOV, SERVO_RMOV, SERVO_RUMOV, SERVO_RDMOV, SERVO_UMOV, SERVO_DMOV]))
+			arduino.write(bytes(f"{anxiety_queue[i]}", "utf-8"))
+		for i in range(3) :
+			arduino.write(bytes(f"{reverse_move(anxiety_queue[i])}", "utf-8"))
 	elif len(detected_profiles) != 0 and len(detected_faces) != 0 :
 		arduino.write(bytes(f"{SERVO_NOMOV}", "utf-8"))
 	else :
@@ -99,10 +121,10 @@ while True:
 		if eyeY < target[1] or eyeY > (target[1] + target[3]) :
 			if eyeY < target[1] :
 				eyeY += SERVO_SPD
-				eyeDir += 2
+				eyeDir += 2 # As moving down values had been set up to horizontal move + 2
 			else :
 				eyeY -= SERVO_SPD
-				eyeDir += 1
+				eyeDir += 1 # As moving up values had been set up to horizontal move + 1
 		
 		arduino.write(bytes(f"{eyeDir}", "utf-8"))
 

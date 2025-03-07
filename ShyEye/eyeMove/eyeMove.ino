@@ -19,12 +19,13 @@
 #define SERVO_UMOV 7
 #define SERVO_DMOV 8
 
-#define LOOK_LEFT -45
-#define LOOK_RIGHT 45
-#define LOOK_UP 45
-#define LOOK_DOWN -45
+#define LOOK_LEFT 30
+#define LOOK_RIGHT -30
+#define LOOK_UP 30
+#define LOOK_DOWN -30
 
-#define START_POS 90
+#define START_POS_X 90
+#define START_POS_Y 115
 
 Servo servoX;
 Servo servoY;
@@ -36,8 +37,8 @@ void setup() {
   servoX.attach(9);  // Attach servoX to pin 9
   servoY.attach(10); // Attach servoY to pin 10
 
-  servoX.write(START_POS);
-  servoY.write(START_POS);
+  servoX.write(START_POS_X);
+  servoY.write(START_POS_Y);
   delay(1000);
 
   Serial.begin(9600);
@@ -68,43 +69,43 @@ void loop() {
 
   switch (eyeDir) {
     case SERVO_LMOV:
-      moveServo(servoX, START_POS + LOOK_LEFT, isServoXAttached, 9);
+      moveServo(servoX, START_POS_X + LOOK_LEFT, isServoXAttached, 9);
       stopServo(servoY, isServoYAttached);
       break;
 
     case SERVO_LUMOV:
-      moveServo(servoX, START_POS + LOOK_LEFT, isServoXAttached, 9);
-      moveServo(servoY, START_POS + LOOK_UP, isServoYAttached, 10);
+      moveServo(servoX, START_POS_X + LOOK_LEFT, isServoXAttached, 9);
+      moveServo(servoY, START_POS_Y + LOOK_UP, isServoYAttached, 10);
       break;
 
     case SERVO_LDMOV:
-      moveServo(servoX, START_POS + LOOK_LEFT, isServoXAttached, 9);
-      moveServo(servoY, START_POS + LOOK_DOWN, isServoYAttached, 10);
+      moveServo(servoX, START_POS_X + LOOK_LEFT, isServoXAttached, 9);
+      moveServo(servoY, START_POS_Y + LOOK_DOWN, isServoYAttached, 10);
       break;
 
     case SERVO_RMOV:
-      moveServo(servoX, START_POS + LOOK_RIGHT, isServoXAttached, 9);
+      moveServo(servoX, START_POS_X + LOOK_RIGHT, isServoXAttached, 9);
       stopServo(servoY, isServoYAttached);
       break;
 
     case SERVO_RUMOV:
-      moveServo(servoX, START_POS + LOOK_RIGHT, isServoXAttached, 9);
-      moveServo(servoY, START_POS + LOOK_UP, isServoYAttached, 10);
+      moveServo(servoX, START_POS_X + LOOK_RIGHT, isServoXAttached, 9);
+      moveServo(servoY, START_POS_Y + LOOK_UP, isServoYAttached, 10);
       break;
 
     case SERVO_RDMOV:
-      moveServo(servoX, START_POS + LOOK_RIGHT, isServoXAttached, 9);
-      moveServo(servoY, START_POS + LOOK_DOWN, isServoYAttached, 10);
+      moveServo(servoX, START_POS_X + LOOK_RIGHT, isServoXAttached, 9);
+      moveServo(servoY, START_POS_Y + LOOK_DOWN, isServoYAttached, 10);
       break;
 
     case SERVO_UMOV:
       stopServo(servoX, isServoXAttached);
-      moveServo(servoY, START_POS + LOOK_UP, isServoYAttached, 10);
+      moveServo(servoY, START_POS_Y + LOOK_UP, isServoYAttached, 10);
       break;
 
     case SERVO_DMOV:
       stopServo(servoX, isServoXAttached);
-      moveServo(servoY, START_POS + LOOK_DOWN, isServoYAttached, 10);
+      moveServo(servoY, START_POS_Y + LOOK_DOWN, isServoYAttached, 10);
       break;
 
     default:
